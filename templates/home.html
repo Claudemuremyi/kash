@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<div class="welcome-section">
+    <h1>Welcome to Kash</h1>
+    <p>Your personal finance management tool</p>
+    <div class="auth-buttons">
+        {% if user.is_authenticated %}
+            <a href="{% url 'expenses' %}" class="btn btn-primary btn-lg mr-2">View Expenses</a>
+            <a href="{% url 'income' %}" class="btn btn-success btn-lg">View Income</a>
+            <a href="{% url 'expenses' %}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Login</a>
+            <a href="{% url 'register' %}" class="btn btn-success btn-lg">Register</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
+                    <h3 class="card-title">Track Expenses</h3>
+                    <p class="card-text">Monitor your spending habits and stay on top of your finances.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-piggy-bank fa-3x mb-3 text-primary"></i>
+                    <h3 class="card-title">Manage Income</h3>
+                    <p class="card-text">Keep track of your income sources and plan your budget effectively.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-pie fa-3x mb-3 text-primary"></i>
+                    <h3 class="card-title">Visualize Data</h3>
+                    <p class="card-text">Get insights into your financial patterns with interactive charts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Empty space -->
+<div class="container mt-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+        </div>
+    </div>
+</div>
+{% endblock %}
+

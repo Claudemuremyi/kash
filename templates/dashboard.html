@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Financial Dashboard</h1>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Income</h5>
+                    <p class="card-text h2 text-success">₹{{ total_income }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Expenses</h5>
+                    <p class="card-text h2 text-danger">₹{{ total_expenses }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Net Balance</h5>
+                    <p class="card-text h2 {% if net_balance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        ₹{{ net_balance }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Income vs Expenses Over Time</h5>
+                    <canvas id="timeSeriesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Income Distribution</h5>
+                    <canvas id="incomeDonutChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Expense Categories</h5>
+                    <canvas id="expenseDonutChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Parse JSON data from Django
+    const monthlyExpenses = {{ monthly_expenses|safe }};
+    const monthlyIncome = {{ monthly_income|safe }};
+    const expenseCategories = {{ expense_categories|safe }};
+    const incomeSources = {{ income_sources|safe }};
+
+    // Time Series Chart
+    new Chart(document.getElementById('timeSeriesChart'), {
+        type: 'line',
+        data: {
+            labels: [...new Set([...monthlyExpenses.map(e => e.month), ...monthlyIncome.map(i => i.month)])],
+            datasets: [{
+                label: 'Income',
+                data: monthlyIncome.map(i => i.total),
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'Expenses',
+                data: monthlyExpenses.map(e => e.total),
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Income Donut Chart
+    new Chart(document.getElementById('incomeDonutChart'), {
+        type: 'doughnut',
+        data: {
+            labels: incomeSources.map(s => s.source),
+            datasets: [{
+                data: incomeSources.map(s => s.total),
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)',
+                    'rgb(75, 192, 192)',
+                    'rgb(153, 102, 255)',
+                    'rgb(255, 159, 64)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+
+    // Expense Donut Chart
+    new Chart(document.getElementById('expenseDonutChart'), {
+        type: 'doughnut',
+        data: {
+            labels: expenseCategories.map(c => c.category),
+            datasets: [{
+                data: expenseCategories.map(c => c.total),
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)',
+                    'rgb(75, 192, 192)',
+                    'rgb(153, 102, 255)',
+                    'rgb(255, 159, 64)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+
